@@ -31,7 +31,26 @@
 | ![alt text](imges/blue.png) | ![alt text](imges/no-water.png) |
 
 
-# 향후
-1. STM32 보드와의 UART 연동을 통한 물리적 제어 시스템 확장
-침수 감지 이벤트가 발생하면 Raspberry Pi가 UART를 통해 STM32 보드로 신호를 전송하고,
-STM32에서는 수신한 상태 값에 따라 LED 점등, 부저 알람 등 실제 물리적 액션을 수행하는 구조로 확장할 예정입니다.
+# 5. 어려웠던 점 & 해결 과정
+
+### 1) 모델 학습 불안정 문제
+  - 초기: `no_water`, `blue`, `mid`, `red` 4-class 분류로 설계
+  - 실제 데이터가 부족해 학습이 불안정하고 정확도가 낮게 나오는 문제가 발생
+  - 문제 단순화를 위해 2-class(침수 / 비침수)로 재구성하고 파인튜닝
+
+  → **결과:** 학습 안정화 및 실제 환경에서 분류 정확도가 크게 개선됨
+
+### 2) MacOS 로컬 MQTT Broker 연결 문제
+  - MacOS에서 Mosquitto Broker가 포트·권한 문제로 연결되지 않는 오류 발생
+  - Raspberry Pi Publisher가 지속적으로 연결을 시도했지만 실패
+  - 안정적 테스트를 위해 AWS EC2에 Mosquitto Broker를 새로 구성
+
+  → **결과:** Raspberry Pi ↔ EC2 간 MQTT 통신이 안정적으로 동작
+
+# 6. 향후 보안 
+### 1) 물리적 제어 시스템 확장
+  - STM32 보드와 UART 연동 예정  
+  - 침수 감지 시 Raspberry Pi → STM32로 상태 값 전송  
+  - STM32에서 LED, 부저 등 물리적 제어 수행  
+
+### 2) 침수 단계 세분화 모델 재설계
